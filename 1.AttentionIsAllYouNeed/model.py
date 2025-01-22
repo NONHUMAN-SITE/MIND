@@ -20,7 +20,6 @@ class BasicTokenizer:
         return len(self.string2int)
     
 class Head(nn.Module):
-    """ one head of self-attention """
 
     def __init__(self,
                  n_embd:int,
@@ -36,12 +35,6 @@ class Head(nn.Module):
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
-        '''
-        Notas:
-        * No importa el tamaño de la entrada, manejamos los tamaños adecuando las entradas y salidas con T.
-        * Usamos wei.masked_fill para evitar que los tokens no puedan ver los tokens futuros.
-        * wei solo es una forma más eficiente de implementar este masking.
-        '''
         B,T,C = x.shape
         k = self.key(x)   # (B,T,C)
         q = self.query(x) # (B,T,C)
@@ -56,7 +49,6 @@ class Head(nn.Module):
         return out
 
 class MultiHeadAttention(nn.Module):
-    """ multiple heads of self-attention in parallel """
 
     def __init__(self,
                  n_embd:int,
@@ -75,7 +67,6 @@ class MultiHeadAttention(nn.Module):
         return out
 
 class FeedFoward(nn.Module):
-    """ a simple linear layer followed by a non-linearity """
 
     def __init__(self,
                  n_embd:int,
@@ -92,14 +83,12 @@ class FeedFoward(nn.Module):
         return self.net(x)
 
 class Block(nn.Module):
-    """ Transformer block: communication followed by computation """
 
     def __init__(self,
                  n_embd:int,
                  n_head:int,
                  dropout:float,
                  context_length:int):
-        # n_embd: embedding dimension, n_head: the number of heads we'd like
         super().__init__()
         head_size = n_embd // n_head
         self.sa = MultiHeadAttention(n_embd,n_head,head_size,dropout,context_length)
@@ -131,16 +120,6 @@ class LanguageModel(nn.Module):
         self.device = device
 
     def positional_encoding(self,seq_len:int, d_model:int):
-        """
-        Genera el encoding posicional para un modelo de transformador.
-
-        Args:
-            seq_len (int): Longitud de la secuencia (número de posiciones).
-            d_model (int): Dimensión del modelo (tamaño de los embeddings).
-
-        Returns:
-            torch.Tensor: Tensor de tamaño (seq_len, d_model) con los encodings posicionales.
-        """
         position = torch.arange(0, seq_len, dtype=torch.float).unsqueeze(1)
 
         div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
@@ -160,10 +139,19 @@ class LanguageModel(nn.Module):
         x = self.ln_f(x)
         logits = self.lm_head(x)
 
-        # If we are not training, we don't need to compute the loss
         if targets is None:
             loss = None
             return logits,loss
         else:
             loss = F.cross_entropy(logits.view(-1,logits.size(-1)),targets.view(-1))
             return logits,loss
+        
+    def generate(self,idx,max_new_tokens):
+        for _ in range(max_new_tokens):
+            idx_cond = idx[:, -self.context_length:]
+            logits,loss = self(idx_cond)
+            logits = logits[:, -1, :]
+            probs = F.softmax(logits, dim=-1)
+            idx_next = torch.multinomial(probs, num_samples=1)
+            idx = torch.cat((idx, idx_next), dim=-1)
+            yield idx
