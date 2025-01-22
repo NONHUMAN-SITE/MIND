@@ -70,11 +70,9 @@ def main():
             loss.backward()
             optimizer.step()
             loss_epoch += loss.item()
-            logger.log(f"Epoch {epoch+1}, Loss: {loss.item()}")
             summary_writer.add_scalar("Loss/train",loss.item(),step)
             step += 1
 
-        logger.log(f"Epoch {epoch+1} completed, Loss: {loss_epoch/len(train_loader)}")
         summary_writer.add_scalar("Loss/train",loss_epoch/len(train_loader),epoch)
         if (epoch+1) % args.save_every == 0:
             torch.save(model.state_dict(),f"models/model_{epoch+1}.pth")

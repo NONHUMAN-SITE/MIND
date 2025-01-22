@@ -1,8 +1,8 @@
 dataset="pdfs"
-batch_size=64
-epochs=30
-learning_rate=0.001
-save_every=10
+batch_size=128
+epochs=5
+learning_rate=0.0001
+save_every=1
 
 python train.py \
 --dataset $dataset \
