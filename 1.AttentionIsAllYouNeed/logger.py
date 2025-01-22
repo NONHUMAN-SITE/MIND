@@ -17,12 +17,12 @@ class Logger:
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
         
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.DEBUG)
-        console_handler.setFormatter(logging.Formatter("%(message)s"))
+        #console_handler = logging.StreamHandler()
+        #console_handler.setLevel(logging.DEBUG)
+        #console_handler.setFormatter(logging.Formatter("%(message)s"))
         
         self.logger.addHandler(file_handler)
-        self.logger.addHandler(console_handler)
+        #self.logger.addHandler(console_handler)
 
     def log(self, message):
         print(f"{self.COLORS['INFO']}INFO: {message}{self.COLORS['RESET']}")

@@ -8,12 +8,12 @@ def extract_text_from_pdf(pdf_path):
             text += page.extract_text()
         return text
 
-def merge_pdfs_text(pdf_paths) -> str:
+def merge_pdfs_text(pdfs_paths) -> str:
     try:
         text = ""
-        for pdf_path in pdf_paths:
+        for pdf_path in pdfs_paths:
             text += extract_text_from_pdf(pdf_path)
         return text
     except Exception as e:
-        raise ValueError(f"Error merging pdfs: {e}. The pdfs paths must be valid paths to pdf files. The pdfs paths are: {pdf_paths}")
+        raise ValueError(f"Error merging pdfs: {e}. The pdfs paths must be valid paths to pdf files. The pdfs paths are: {pdfs_paths}")
 

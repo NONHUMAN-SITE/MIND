@@ -34,7 +34,7 @@ class GPTDataset(Dataset):
         return len(self.data)
     
     def __getitem__(self,idx):
-        idx = min(idx,len(self.data)-self.context_length) # This is to ensure that the index is within the bounds of the dataset
+        idx = min(idx,len(self.data)-self.context_length-1) # This is to ensure that the index is within the bounds of the dataset
         x = torch.stack([self.data[idx:idx+self.context_length]])
         y = torch.stack([self.data[idx+1:idx+self.context_length+1]])
-        return x,y
+        return x.squeeze(),y.squeeze()

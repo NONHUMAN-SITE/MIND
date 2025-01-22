@@ -7,8 +7,8 @@ import math
 class BasicTokenizer:
 
     def __init__(self,text:str):
-        self.string2int = {ch:i for i,ch in enumerate(text)}
-        self.int2string = {i:ch for i,ch in enumerate(text)}
+        self.string2int = {ch:i for i,ch in enumerate(set(text))}
+        self.int2string = {i:ch for i,ch in enumerate(set(text))}
 
     def tokenize(self,text:str):
         return [self.string2int[ch] for ch in text]
@@ -19,7 +19,6 @@ class BasicTokenizer:
     def __len__(self):
         return len(self.string2int)
     
-
 class Head(nn.Module):
     """ one head of self-attention """
 
@@ -124,11 +123,12 @@ class LanguageModel(nn.Module):
                  device:torch.device):
         
         super().__init__()
+        self.n_embd = n_embd
         self.token_embedding_table = nn.Embedding(vocab_size,n_embd)
-        self.position_embedding_table = nn.Embedding(context_length,n_embd)
         self.blocks = nn.Sequential(*[Block(n_embd,n_head,dropout,context_length) for _ in range(n_layer)])
         self.ln_f = nn.LayerNorm(n_embd)
         self.lm_head = nn.Linear(n_embd,vocab_size)
+        self.device = device
 
     def positional_encoding(self,seq_len:int, d_model:int):
         """
@@ -153,7 +153,6 @@ class LanguageModel(nn.Module):
 
     def forward(self,idx,targets=None):
         B,T = idx.shape
-
         token_embeddings = self.token_embedding_table(idx)
         position_embeddings = self.positional_encoding(T,self.n_embd).to(self.device)
         x = token_embeddings + position_embeddings
@@ -168,16 +167,3 @@ class LanguageModel(nn.Module):
         else:
             loss = F.cross_entropy(logits.view(-1,logits.size(-1)),targets.view(-1))
             return logits,loss
-
-if __name__ == "__main__":
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-    vocab_size = 256
-    context_length = 64
-    n_embd = 128
-    n_head = 4
-    n_layer = 4
-    dropout = 0.2
-
-    model = LanguageModel(vocab_size,context_length,n_embd,n_head,n_layer,dropout,device)
-    print(model)

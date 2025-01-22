@@ -3,10 +3,10 @@ import argparse
 import torch
 from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
-from .processor_pdf import merge_pdfs_text
-from .model import BasicTokenizer,LanguageModel
-from .dataset import GPTDataset
-from .logger import logger
+from processor_pdf import merge_pdfs_text
+from model import BasicTokenizer,LanguageModel
+from dataset import GPTDataset
+from logger import logger
 
 
 
@@ -35,22 +35,27 @@ def main():
     train_dataset = GPTDataset(text,"train",0.8,context_length=64,tokenizer=tokenizer)
     train_loader = torch.utils.data.DataLoader(train_dataset,batch_size=args.batch_size,shuffle=True)
 
-    vocab_size = len(tokenizer)
+    test_dataset = GPTDataset(text,"test",0.8,context_length=64,tokenizer=tokenizer)
+    test_loader = torch.utils.data.DataLoader(test_dataset,batch_size=args.batch_size,shuffle=True)
+
+    vocab_size = len(sorted(list(set(text))))
     logger.log(f"Vocab size: {vocab_size}")
     
     logger.log(f"Creating model...")
+    device = "cuda" if torch.cuda.is_available() else "cpu"
     model = LanguageModel(vocab_size=vocab_size,
                           context_length=64,
                           n_embd=128,
                           n_head=4,
                           n_layer=4,
                           dropout=0.2,
-                          device="cuda" if torch.cuda.is_available() else "cpu")   
+                          device=device)
+    model.to(device)
     
     logger.log(f"Creating optimizer...")
     optimizer = torch.optim.AdamW(model.parameters(),lr=args.learning_rate)
 
-    logger.log(f"Total parameters: {model.num_parameters()}")
+    logger.log(f"Total parameters: {sum(p.numel() for p in model.parameters())}")
 
     logger.log(f"Training...")
     step = 0
@@ -59,6 +64,8 @@ def main():
         for batch in tqdm(train_loader,total=len(train_loader),desc=f"Epoch {epoch+1}"):
             optimizer.zero_grad()
             input_ids,labels = batch
+            input_ids = input_ids.to(device)
+            labels = labels.to(device)
             output,loss = model(input_ids,labels)
             loss.backward()
             optimizer.step()
