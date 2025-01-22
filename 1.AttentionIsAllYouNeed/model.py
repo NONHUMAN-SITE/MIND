@@ -16,6 +16,9 @@ class BasicTokenizer:
     def detokenize(self,tokens:list[int]):
         return "".join([self.int2string[i] for i in tokens])
     
+    def __len__(self):
+        return len(self.string2int)
+    
 
 class Head(nn.Module):
     """ one head of self-attention """

@@ -1,10 +1,10 @@
 import torch
 from torch.utils.data import Dataset
-from gpt import BasicTokenizer
+from model import BasicTokenizer
 
 
 class GPTDataset(Dataset):
-    
+
     def __init__(self,
                  text:str,
                  type:str,
@@ -38,10 +38,3 @@ class GPTDataset(Dataset):
         x = torch.stack([self.data[idx:idx+self.context_length]])
         y = torch.stack([self.data[idx+1:idx+self.context_length+1]])
         return x,y
-
-
-if __name__ == "__main__":
-    text = "Hello, how are you?"
-    tokenizer = BasicTokenizer(text)
-    dataset = GPTDataset(text,"train",0.8,context_length=10,tokenizer=tokenizer)
-    print(dataset[100])
