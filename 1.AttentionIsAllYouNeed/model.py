@@ -2,13 +2,22 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import math
-
+import json
+from dataclasses import dataclass
 
 class BasicTokenizer:
 
-    def __init__(self,text:str):
-        self.string2int = {ch:i for i,ch in enumerate(set(text))}
-        self.int2string = {i:ch for i,ch in enumerate(set(text))}
+    def __init__(self,text=None,path=None):
+        if text is not None:
+            self.string2int = {ch:i for i,ch in enumerate(set(text))}
+            self.int2string = {i:ch for i,ch in enumerate(set(text))}
+        elif path is not None:
+            with open(path,"r") as f:
+                data = json.load(f)
+                self.string2int = data["string2int"]
+                self.int2string = data["int2string"]
+        else:
+            raise ValueError("Either text or path must be provided")
 
     def tokenize(self,text:str):
         return [self.string2int[ch] for ch in text]
@@ -19,6 +28,14 @@ class BasicTokenizer:
     def __len__(self):
         return len(self.string2int)
     
+    def get_vocab_size(self):
+        return len(self.string2int)
+
+    def save_tokenizer(self,path:str):
+        with open(path,"w") as f:
+            json.dump({"string2int":self.string2int,"int2string":self.int2string},f,indent=4)
+
+
 class Head(nn.Module):
 
     def __init__(self,
@@ -112,12 +129,28 @@ class LanguageModel(nn.Module):
                  device:torch.device):
         
         super().__init__()
+        
+        self.vocab_size = vocab_size
+        self.context_length = context_length
         self.n_embd = n_embd
+        self.n_head = n_head
+        self.n_layer = n_layer
+        self.dropout = dropout
+
         self.token_embedding_table = nn.Embedding(vocab_size,n_embd)
         self.blocks = nn.Sequential(*[Block(n_embd,n_head,dropout,context_length) for _ in range(n_layer)])
         self.ln_f = nn.LayerNorm(n_embd)
         self.lm_head = nn.Linear(n_embd,vocab_size)
         self.device = device
+
+    def save_parameters(self,path:str):
+        with open(path,"w") as f:
+            json.dump({"vocab_size":self.vocab_size,
+                       "context_length":self.context_length,
+                       "n_embd":self.n_embd,
+                       "n_head":self.n_head,
+                       "n_layer":self.n_layer,
+                       "dropout":self.dropout},f,indent=4)
 
     def positional_encoding(self,seq_len:int, d_model:int):
         position = torch.arange(0, seq_len, dtype=torch.float).unsqueeze(1)
@@ -152,6 +185,8 @@ class LanguageModel(nn.Module):
             logits,loss = self(idx_cond)
             logits = logits[:, -1, :]
             probs = F.softmax(logits, dim=-1)
+            print(f"probs: {probs}")
             idx_next = torch.multinomial(probs, num_samples=1)
+            print(f"idx_next: {idx_next}")
             idx = torch.cat((idx, idx_next), dim=-1)
             yield idx

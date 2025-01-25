@@ -1,4 +1,4 @@
-dataset="pdfs"
+dataset="data"
 batch_size=128
 epochs=5
 learning_rate=0.0001
