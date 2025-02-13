@@ -4,14 +4,9 @@ import yaml
 from src.model import LanguageModel, BasicTokenizer
 from src.logger import logger
 
-def get_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--experiment_dir", type=str, required=True, help="Path to experiment directory")
-    return parser.parse_args()
 
 def main():
-    args = get_args()
-    experiment_dir = args.experiment_dir
+    experiment_dir = "experiments/your_experiment_id"
 
     # Load config from experiment directory
     logger.log(f"Loading config from {experiment_dir}/config.yaml")
@@ -21,9 +16,14 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.log(f"Using device: {device}")
 
+    # Load tokenizer
+    tokenizer_path = f"{experiment_dir}/tokenizer.json"
+    logger.log(f"Loading tokenizer from {tokenizer_path}")
+    tokenizer = BasicTokenizer(path=tokenizer_path)
+
     # Create model using parameters from config
     model = LanguageModel(
-        vocab_size=config['model']['vocab_size'],
+        vocab_size=tokenizer.get_vocab_size(),
         context_length=config['training']['context_length'],
         n_embd=config['model']['n_embd'],
         n_head=config['model']['n_head'],
@@ -36,13 +36,9 @@ def main():
     # Load model weights
     model_path = f"{experiment_dir}/models/last.pth"
     logger.log(f"Loading model from {model_path}")
-    model.load_state_dict(torch.load(model_path, map_location=device))
+    model.load_state_dict(torch.load(model_path, map_location=device,weights_only=True))
     model.eval()
 
-    # Load tokenizer
-    tokenizer_path = f"{experiment_dir}/tokenizer.json"
-    logger.log(f"Loading tokenizer from {tokenizer_path}")
-    tokenizer = BasicTokenizer(path=tokenizer_path)
 
     # Get input from user
     text = input("Put some text: ")
