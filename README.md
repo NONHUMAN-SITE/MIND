@@ -12,50 +12,38 @@ For additional notes and resources, visit: [www.nonhuman.site](http://www.nonhum
 
 Below is the roadmap for this repository. Each topic is structured to guide your learning and includes a checklist to track progress:  
 
-### 1. Architecture  
-- [ ] **1.1 Attention Is All You Need**  
-- [ ] **1.2 GPT-2**  
+### 1. Fundamentals  
+- [x] **1.1 Attention Is All You Need**  
+- [x] **1.2 Implementation**  
 
-### 2. Training  
-- [ ] **2.1 Data** (Tokenizer, types of datasets used)  
-- [ ] **2.2 LoRA**  
-- [ ] **2.3 RLHF**  
-- [ ] **2.4 DPO**  
-- [ ] **2.5 Scaling Laws**  
+### 2. Assistant  
+- [ ] **2.1 Under development**  
+- [ ] **2.2 RLHF**  
+- [ ] **2.3 DPO**  
 
-### 3. Validation  
-- [ ] **3.1 Benchmarks**  
+### 3. Optimization  
+- [ ] **3.1 Under development**  
+- [ ] **3.2 LoRA**  
+- [ ] **3.3 Scaling Laws**  
 
-### 4. New Architectures  
-- [ ] **4.1 MOE (Mixture of Experts)**  
-- [ ] **4.2 VLM (Vision-Language Models)**  
-- [ ] **4.3 Speech-to-Speech**  
+### 4. Data  
+- [ ] **4.1 Under development**  
+- [ ] **4.2 Training Data and Benchmarks**  
 
-### 5. Roadmap to O(1) (Test Time Compute)  
-- [ ] **5.1 Optimization Techniques**  
+### 5. Architectures  
+- [ ] **5.1 Under development**  
+- [ ] **5.2 MOE**  
+- [ ] **5.3 VLM**  
+- [ ] **5.4 Qwen2-Audio**  
 
----
+### 6. Reasoning models  
+- [ ] **6.1 Under development**  
+- [ ] **6.2 Deepseek Math**  
+- [ ] **6.3 Deepseek R1**  
+- [ ] **6.4 Road to O1**  
 
-## 🛠 Installation  
-
-To get started, follow these steps:  
-
-```bash
-# Clone the repository
-git clone https://github.com/NONHUMAN-SITE/MIND  
-
-# Navigate to the project folder
-cd MIND  
-
-# Create a virtual environment
-conda create --name mind  
-
-# Activate the environment
-conda activate mind  
-
-# Install the required dependencies
-pip install -r requirements.txt  
-```  
+### 7. Roadmap to O(1) (Test Time Compute)  
+- [ ] **7.1 Optimization Techniques**  
 
 ---
 

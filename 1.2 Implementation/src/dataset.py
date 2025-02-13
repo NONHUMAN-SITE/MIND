@@ -1,14 +1,11 @@
 import torch
 from torch.utils.data import Dataset
-from model import BasicTokenizer
 
 
 class GPTDataset(Dataset):
 
     def __init__(self,
                  text:str,
-                 type:str,
-                 split:float,
                  context_length:int,    
                  tokenizer):
         '''
@@ -19,14 +16,7 @@ class GPTDataset(Dataset):
         tokenizer: This is the tokenizer to be used
         '''
         
-        assert type in ["train","test"]
-        assert 0 <= split <= 1
-
-        if type == "train":
-            self.data = torch.tensor(tokenizer.tokenize(text[:int(len(text)*split)]))
-        else:
-            self.data = torch.tensor(tokenizer.tokenize(text[int(len(text)*split):]))
-        
+        self.data = torch.tensor(tokenizer.tokenize(text))
         self.tokenizer = tokenizer
         self.context_length = context_length
         

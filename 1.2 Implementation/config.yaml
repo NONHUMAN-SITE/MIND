@@ -1,0 +1,17 @@
+training:
+  batch_size: 64
+  epochs: 30
+  learning_rate: 0.0001
+  save_every: 10
+  context_length: 64
+
+model:
+  n_embd: 256
+  n_head: 4
+  n_layer: 4
+  dropout: 0.2
+
+paths:
+  models_dir: "models"
+  experiments_dir: "experiments"
+  tensorboard_dir: "runs"

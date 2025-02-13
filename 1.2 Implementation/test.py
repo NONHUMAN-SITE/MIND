@@ -4,9 +4,8 @@ from model import BasicTokenizer
 import json
 
 
-
 def main():
-    experiment_id = "dd7be62c-55cc-4404-999f-41bcc93a6616"
+    experiment_id = "a971053c-dc7b-4633-a224-1c6fac23107f"
 
     parameters = json.load(open(f"experiments/{experiment_id}/model_parameters.json","r"))
 
@@ -22,7 +21,7 @@ def main():
     
     model.to(device)
 
-    model.load_state_dict(torch.load(f"experiments/{experiment_id}/model_5.pth"))
+    model.load_state_dict(torch.load(f"experiments/{experiment_id}/model_23.pth", weights_only=True))
 
     tokenizer = BasicTokenizer(path=f"experiments/{experiment_id}/tokenizer.json")
 
@@ -32,14 +31,11 @@ def main():
 
     input_ids = torch.tensor(tokens).unsqueeze(0).to(device)
 
-    text = ""
-    for final_idx in model.generate(input_ids,max_new_tokens=2000):
-        print(f"final_idx.shape: {final_idx.shape}")
-        last_token = final_idx[0][-1]
-        print(f"last_token: {last_token}")
-        last_token = tokenizer.detokenize([str(last_token.item())])
-        text += last_token
-        print(text)
+    text = "."
+    print(f"Texto inicial: {text}")
+    for last_token in model.generate(input_ids,max_new_tokens=4000):
+        last_token = tokenizer.detokenize([str(last_token)])
+        print(last_token,end="")
 
 if __name__ == "__main__":
     main()

@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 import math
 import json
-from dataclasses import dataclass
 
 class BasicTokenizer:
 
@@ -53,16 +52,16 @@ class Head(nn.Module):
 
     def forward(self, x):
         B,T,C = x.shape
-        k = self.key(x)   # (B,T,C)
-        q = self.query(x) # (B,T,C)
+        k = self.key(x)   # (B,T,H)
+        q = self.query(x) # (B,T,H)
         
-        wei = q @ k.transpose(-2,-1) * C**-0.5 # (B, T, C) @ (B, C, T) -> (B, T, T)
+        wei = q @ k.transpose(-2,-1) * C**-0.5 # (B, T, H) @ (B, H, T) -> (B, T, T)
         wei = wei.masked_fill(self.tril[:T, :T] == 0, float('-inf')) # (B, T, T)
         wei = F.softmax(wei, dim=-1) # (B, T, T)
         wei = self.dropout(wei)
         
-        v = self.value(x) # (B,T,C)
-        out = wei @ v # (B, T, T) @ (B, T, C) -> (B, T, C)
+        v = self.value(x) # (B,T,H)
+        out = wei @ v # (B, T, T) @ (B, T, H) -> (B, T, H)
         return out
 
 class MultiHeadAttention(nn.Module):
@@ -79,8 +78,9 @@ class MultiHeadAttention(nn.Module):
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
-        out = torch.cat([h(x) for h in self.heads], dim=-1)
-        out = self.dropout(self.proj(out))
+        # X is (B,T,C)
+        out = torch.cat([h(x) for h in self.heads], dim=-1) # (B,T,H)
+        out = self.dropout(self.proj(out)) # (B,T,C)
         return out
 
 class FeedFoward(nn.Module):
@@ -97,7 +97,8 @@ class FeedFoward(nn.Module):
         )
 
     def forward(self, x):
-        return self.net(x)
+        # X is (B,T,C)
+        return self.net(x) # (B,T,C)
 
 class Block(nn.Module):
 
@@ -114,8 +115,9 @@ class Block(nn.Module):
         self.ln2 = nn.LayerNorm(n_embd)
 
     def forward(self, x):
-        x = x + self.sa(self.ln1(x))
-        x = x + self.ffwd(self.ln2(x))
+        # X is (B,T,C)
+        x = x + self.sa(self.ln1(x)) # (B,T,C)
+        x = x + self.ffwd(self.ln2(x)) # (B,T,C)
         return x
 
 class LanguageModel(nn.Module):
@@ -143,14 +145,17 @@ class LanguageModel(nn.Module):
         self.lm_head = nn.Linear(n_embd,vocab_size)
         self.device = device
 
-    def save_parameters(self,path:str):
-        with open(path,"w") as f:
-            json.dump({"vocab_size":self.vocab_size,
-                       "context_length":self.context_length,
-                       "n_embd":self.n_embd,
-                       "n_head":self.n_head,
-                       "n_layer":self.n_layer,
-                       "dropout":self.dropout},f,indent=4)
+    def save_parameters(self, path: str):
+        params = {
+            "vocab_size": self.vocab_size,
+            "context_length": self.context_length,
+            "n_embd": self.n_embd,
+            "n_head": self.n_head,
+            "n_layer": self.n_layer,
+            "dropout": self.dropout
+        }
+        with open(path, "w") as f:
+            json.dump(params, f, indent=4)
 
     def positional_encoding(self,seq_len:int, d_model:int):
         position = torch.arange(0, seq_len, dtype=torch.float).unsqueeze(1)
@@ -167,10 +172,10 @@ class LanguageModel(nn.Module):
         B,T = idx.shape
         token_embeddings = self.token_embedding_table(idx)
         position_embeddings = self.positional_encoding(T,self.n_embd).to(self.device)
-        x = token_embeddings + position_embeddings
-        x = self.blocks(x)
-        x = self.ln_f(x)
-        logits = self.lm_head(x)
+        x = token_embeddings + position_embeddings # (B,T,C)
+        x = self.blocks(x) # (B,T,C)
+        x = self.ln_f(x) # (B,T,C)
+        logits = self.lm_head(x) # (B,T,VOCAB_SIZE)
 
         if targets is None:
             loss = None
@@ -179,14 +184,12 @@ class LanguageModel(nn.Module):
             loss = F.cross_entropy(logits.view(-1,logits.size(-1)),targets.view(-1))
             return logits,loss
         
-    def generate(self,idx,max_new_tokens):
+    def generate(self, idx, max_new_tokens):
         for _ in range(max_new_tokens):
             idx_cond = idx[:, -self.context_length:]
-            logits,loss = self(idx_cond)
-            logits = logits[:, -1, :]
-            probs = F.softmax(logits, dim=-1)
-            print(f"probs: {probs}")
+            logits, _ = self(idx_cond)
+            probs = F.softmax(logits[:, -1, :], dim=-1)
             idx_next = torch.multinomial(probs, num_samples=1)
-            print(f"idx_next: {idx_next}")
             idx = torch.cat((idx, idx_next), dim=-1)
-            yield idx
+
+            yield idx_next.item()
