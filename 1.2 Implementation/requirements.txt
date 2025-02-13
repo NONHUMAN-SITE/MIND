@@ -1,0 +1,6 @@
+PyPDF2==3.0.1
+numpy==2.2.2
+torch==2.5.1
+tqdm==4.67.1
+tensorboard==2.18.0
+yaml==6.0.2
