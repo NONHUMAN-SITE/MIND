@@ -105,6 +105,8 @@ def main():
         
         if (epoch+1) % config['training']['save_every'] == 0:
             torch.save(model.state_dict(), f"{models_dir}/model_{epoch+1}.pth")
+        
+        torch.save(model.state_dict(), f"{models_dir}/last.pth")
 
     summary_writer.close()
 
