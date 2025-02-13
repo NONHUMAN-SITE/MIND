@@ -1,8 +1,0 @@
-2025-02-12 18:47:39 - INFO - Experiment ID: bc1ccf1f-c3d1-4b66-9347-542d9d8a5ad8
-2025-02-12 18:47:39 - INFO - Config saved to: experiments/bc1ccf1f-c3d1-4b66-9347-542d9d8a5ad8/config.yaml
-2025-02-12 18:47:39 - INFO - Tensorboard logs will be saved to: experiments/bc1ccf1f-c3d1-4b66-9347-542d9d8a5ad8/tensorboard
-2025-02-12 18:47:39 - INFO - Merging pdfs: data
-2025-02-12 18:47:46 - INFO - Total characters: 2052541
-2025-02-12 18:47:46 - INFO - Tokenizing text
-2025-02-12 18:47:47 - INFO - Vocab size: 111
-2025-02-12 18:47:47 - INFO - Creating model...
