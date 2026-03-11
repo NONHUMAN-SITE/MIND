@@ -14,7 +14,8 @@ For additional notes and resources, visit: [www.nonhuman.site](http://www.nonhum
 Changelog:
 - 2025-03-10: Create repository.
 - 2026-03-03: Add Large Language Models section.
-- 2026-03-10: Add Variational Autoencoders (VAEs) section.
+- 2026-03-10: Add Variational Autoencoders (VAEs) section with complete implementation and theory.
+- 2026-03-11: Add Denoising Diffusion Probabilistic Models (DDPMs)
 
 ---
 
@@ -30,8 +31,16 @@ Below is the roadmap for this repository. Each topic is structured to guide your
 
 - [2.1 Large Language Models](https://github.com/NONHUMAN-SITE/MIND/tree/main/large_language_model), these are the models that are used to generate text. They are the core of VLAs.    
 
+### 5. Generative Models
 
->Under development.
+#### 5.1 Variational Autoencoders (VAEs)
+- [Variational Autoencoders](https://github.com/NONHUMAN-SITE/MIND/tree/main/variational_auto_encoders) - Complete VAE implementation on MNIST with detailed explanations of architecture, training, and limitations that motivate diffusion models.
+
+#### 5.2 Denoising Diffusion Probabilistic Models (DDPMs)
+- [Diffusion Models](https://github.com/NONHUMAN-SITE/MIND/tree/main/denoising_diffusion_probabilistic_models) - From-scratch DDPM implementation demonstrating iterative denoising, U-Net architecture with time conditioning, and high-quality image generation.
+
+> Under development.
+
 ### 3. Vision Language Models
 
 - ViT architecture and its applications.
@@ -39,22 +48,12 @@ Below is the roadmap for this repository. Each topic is structured to guide your
 ### 4. Vision Language Models
 - Vision Language Models (VLMs) are a type of model that can process both text and images. They are the core of VLAs.
 
-
-### 5. Generative Models
-
-#### 5.1 Variational Autoencoders
-- Variational Autoencoders (VAEs) are a type of model that can generate images. They are the core of VLAs.
-
-#### 5.2 Diffusion Models, Denoising Diffusion Probabilistic Models (DDPMs)
-- Diffusion Models are a type of model that can generate images. They are the core of VLAs.
-
 #### 5.3 Flow Matching
 - State of the art method to generate images.
 
 ### 6. Vision Language Action Models
 The models that we use!
 
-
 ---
-Thank you for your interest in MIND! Feel free to contribute and share your insights as we continue to explore the fascinating world of Large Language Models.
+Thank you for your interest in MIND! Feel free to contribute and share your insights as we continue to explore the fascinating world of Visi Models.
 
